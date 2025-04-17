@@ -1,5 +1,4 @@
 name: build
-
 on:
   release:
     types: [created]
@@ -31,24 +30,20 @@ jobs:
             GOARCH: ppc64le
           - GOOS: linux
             GOARCH: riscv64
-            
           - GOOS: windows
             GOARCH: amd64
             ext: .exe
           - GOOS: windows
             GOARCH: arm64
             ext: .exe
-
           - GOOS: darwin
             GOARCH: amd64
           - GOOS: darwin
             GOARCH: arm64
-
           - GOOS: freebsd
             GOARCH: amd64
           - GOOS: freebsd
             GOARCH: arm64
-
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -74,18 +69,12 @@ jobs:
             export ${{ matrix.ENV }}
           fi
           OUTPUT="dist/${APP_NAME}_${GOOS}_${GOARCH}${EXT}"
-          go build -trimpath -ldflags="-s -w" -o "$OUTPUT" ./cmd/main/...          
+          go build -trimpath -ldflags="-s -w" -o "$OUTPUT" ./cmd/main/...
 
       - name: Upload Artifacts
-        env:
-          CGO_ENABLED: 0
-          GOOS: ${{ matrix.GOOS }}
-          GOARCH: ${{ matrix.GOARCH }}
-          APP_NAME: ESurfing-go
-          EXT: ${{ matrix.ext || '' }}
         uses: actions/upload-artifact@v4
         with:
-          name: ${APP_NAME}_${GOOS}_${GOARCH}${EXT}
+          name: ${{ env.APP_NAME }}_${{ matrix.GOOS }}_${{ matrix.GOARCH }}${{ matrix.ext || '' }}
           path: dist/
 
   release:
@@ -94,12 +83,10 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
-
     steps:
       - name: Download Artifacts
         uses: actions/download-artifact@v4
         with:
-          name: binaries
           path: dist
 
       - name: Generate Checksums
