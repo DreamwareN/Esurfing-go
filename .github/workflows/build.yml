@@ -20,9 +20,6 @@ jobs:
             GOARCH: loong64
             ENV: GOMIPS=softfloat
           - GOOS: linux
-            GOARCH: mipsle
-            ENV: GOMIPS=softfloat
-          - GOOS: linux
             GOARCH: mips64
             ENV: GOMIPS=softfloat
           - GOOS: linux
@@ -34,9 +31,7 @@ jobs:
             GOARCH: ppc64le
           - GOOS: linux
             GOARCH: riscv64
-          - GOOS: linux
-            GOARCH: s390x
-
+            
           - GOOS: windows
             GOARCH: amd64
             ext: .exe
