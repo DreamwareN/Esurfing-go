@@ -1,0 +1,180 @@
+name: build
+
+on:
+  release:
+    types: [created]
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - GOOS: linux
+            GOARCH: 386
+          - GOOS: linux
+            GOARCH: amd64
+          - GOOS: linux
+            GOARCH: arm
+          - GOOS: linux
+            GOARCH: arm64
+          - GOOS: linux
+            GOARCH: loong64
+          - GOOS: linux
+            GOARCH: mips
+            ENV: GOMIPS=softfloat
+          - GOOS: linux
+            GOARCH: mipsle
+            ENV: GOMIPS=softfloat
+          - GOOS: linux
+            GOARCH: mips64
+            ENV: GOMIPS=softfloat
+          - GOOS: linux
+            GOARCH: mips64le
+            ENV: GOMIPS=softfloat
+          - GOOS: linux
+            GOARCH: ppc64
+          - GOOS: linux
+            GOARCH: ppc64le
+          - GOOS: linux
+            GOARCH: riscv64
+          - GOOS: linux
+            GOARCH: s390x
+
+          - GOOS: windows
+            GOARCH: 386
+            ext: .exe
+          - GOOS: windows
+            GOARCH: amd64
+            ext: .exe
+          - GOOS: windows
+            GOARCH: arm
+            ext: .exe
+          - GOOS: windows
+            GOARCH: arm64
+            ext: .exe
+
+          - GOOS: darwin
+            GOARCH: amd64
+          - GOOS: darwin
+            GOARCH: arm64
+
+          - GOOS: freebsd
+            GOARCH: 386
+          - GOOS: freebsd
+            GOARCH: amd64
+          - GOOS: freebsd
+            GOARCH: arm
+          - GOOS: freebsd
+            GOARCH: arm64
+          - GOOS: netbsd
+            GOARCH: 386
+          - GOOS: netbsd
+            GOARCH: amd64
+          - GOOS: netbsd
+            GOARCH: arm
+          - GOOS: netbsd
+            GOARCH: arm64
+          - GOOS: openbsd
+            GOARCH: 386
+          - GOOS: openbsd
+            GOARCH: amd64
+          - GOOS: openbsd
+            GOARCH: arm
+          - GOOS: openbsd
+            GOARCH: arm64
+          - GOOS: openbsd
+            GOARCH: mips64
+
+          - GOOS: aix
+            GOARCH: ppc64
+          - GOOS: dragonfly
+            GOARCH: amd64
+          - GOOS: illumos
+            GOARCH: amd64
+          - GOOS: solaris
+            GOARCH: amd64
+
+          - GOOS: plan9
+            GOARCH: 386
+          - GOOS: plan9
+            GOARCH: amd64
+          - GOOS: plan9
+            GOARCH: arm
+          - GOOS: js
+            GOARCH: wasm
+            ext: .wasm
+
+          - GOOS: android
+            GOARCH: 386
+          - GOOS: android
+            GOARCH: amd64
+          - GOOS: android
+            GOARCH: arm
+          - GOOS: android
+            GOARCH: arm64
+          - GOOS: ios
+            GOARCH: amd64
+          - GOOS: ios
+            GOARCH: arm64
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.24.2'
+          check-latest: true
+
+      - name: Prepare Build Environment
+        run: mkdir -p dist
+
+      - name: Build Binary
+        env:
+          CGO_ENABLED: 0
+          ${{ matrix.ENV }}: ""
+        run: |
+          OUTPUT="dist/${APP_NAME}_${GOOS}_${GOARCH}${EXT}"
+          go build -trimpath -ldflags="-s -w" -o "$OUTPUT" ./...
+        env:
+          GOOS: ${{ matrix.GOOS }}
+          GOARCH: ${{ matrix.GOARCH }}
+          APP_NAME: ESurfing-go
+          EXT: ${{ matrix.ext || '' }}
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: universal-binaries
+          path: dist/
+
+  release:
+    name: Create Release
+    needs: [build]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Download Artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: universal-binaries
+          path: dist
+
+      - name: Generate Checksums
+        run: |
+          cd dist
+          sha256sum * > SHA256SUMS.txt
+
+      - name: Upload to Release
+        uses: softprops/action-gh-release@v1
+        with:
+          files: |
+            dist/*
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
