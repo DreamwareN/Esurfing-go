@@ -41,14 +41,6 @@ golang版的广东电信天翼校园（ZSM验证）登入认证客户端
     "max_retry": 100,
     "retry_delay_ms": 1000,
     "network_interface_id": "eth0"
-  },
-  {
-    "username": "用户名2",
-    "password": "密码2",
-    "network_check_interval_ms": 1000,
-    "max_retry": 100,
-    "retry_delay_ms": 1000,
-    "network_interface_id": "eth1"
   }
 ]
 ```

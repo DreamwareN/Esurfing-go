@@ -100,5 +100,6 @@ jobs:
         with:
           files: |
             dist/*
+            dist/*/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
