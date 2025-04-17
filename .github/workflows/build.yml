@@ -92,7 +92,7 @@ jobs:
       - name: Generate Checksums
         run: |
           cd dist
-          sha256sum * > SHA256SUMS.txt
+          sha256sum */* > SHA256SUMS.txt
 
       - name: Upload to Release
         uses: softprops/action-gh-release@v1
