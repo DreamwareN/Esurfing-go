@@ -54,13 +54,6 @@ jobs:
           - GOOS: freebsd
             GOARCH: arm64
 
-          - GOOS: android
-            GOARCH: amd64
-            ENV: CGO_ENABLED=1
-          - GOOS: android
-            GOARCH: arm64
-            ENV: CGO_ENABLED=1
-            
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
