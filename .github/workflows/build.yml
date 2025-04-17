@@ -68,13 +68,13 @@ jobs:
           if [ -n "${{ matrix.ENV }}" ]; then
             export ${{ matrix.ENV }}
           fi
-          OUTPUT="dist/${APP_NAME}_${GOOS}_${GOARCH}${EXT}"
+          OUTPUT="dist/${APP_NAME}-${GOOS}-${GOARCH}${EXT}"
           go build -trimpath -ldflags="-s -w" -o "$OUTPUT" ./cmd/main/...
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.APP_NAME }}_${{ matrix.GOOS }}_${{ matrix.GOARCH }}${{ matrix.ext || '' }}
+          name: ESurfing-go-${{ matrix.GOOS }}-${{ matrix.GOARCH }}${{ matrix.ext || '' }}
           path: dist/
 
   release:
@@ -99,6 +99,5 @@ jobs:
         with:
           files: |
             dist/*
-          tag_name: ${{ github.ref }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
