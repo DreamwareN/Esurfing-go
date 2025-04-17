@@ -137,14 +137,13 @@ jobs:
         env:
           CGO_ENABLED: 0
           ${{ matrix.ENV }}: ""
-        run: |
-          OUTPUT="dist/${APP_NAME}_${GOOS}_${GOARCH}${EXT}"
-          go build -trimpath -ldflags="-s -w" -o "$OUTPUT" ./cmd/main/...
-        env:
           GOOS: ${{ matrix.GOOS }}
           GOARCH: ${{ matrix.GOARCH }}
           APP_NAME: ESurfing-go
           EXT: ${{ matrix.ext || '' }}
+        run: |
+          OUTPUT="dist/${APP_NAME}_${GOOS}_${GOARCH}${EXT}"
+          go build -trimpath -ldflags="-s -w" -o "$OUTPUT" ./cmd/main/...          
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
