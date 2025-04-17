@@ -139,7 +139,7 @@ jobs:
           ${{ matrix.ENV }}: ""
         run: |
           OUTPUT="dist/${APP_NAME}_${GOOS}_${GOARCH}${EXT}"
-          go build -trimpath -ldflags="-s -w" -o "$OUTPUT" ./...
+          go build -trimpath -ldflags="-s -w" -o "$OUTPUT" ./cmd/main/...
         env:
           GOOS: ${{ matrix.GOOS }}
           GOARCH: ${{ matrix.GOARCH }}
