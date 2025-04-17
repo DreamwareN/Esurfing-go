@@ -88,25 +88,6 @@ jobs:
           - GOOS: openbsd
             GOARCH: mips64
 
-          - GOOS: aix
-            GOARCH: ppc64
-          - GOOS: dragonfly
-            GOARCH: amd64
-          - GOOS: illumos
-            GOARCH: amd64
-          - GOOS: solaris
-            GOARCH: amd64
-
-          - GOOS: plan9
-            GOARCH: 386
-          - GOOS: plan9
-            GOARCH: amd64
-          - GOOS: plan9
-            GOARCH: arm
-          - GOOS: js
-            GOARCH: wasm
-            ext: .wasm
-
           - GOOS: android
             GOARCH: 386
           - GOOS: android
@@ -136,19 +117,21 @@ jobs:
       - name: Build Binary
         env:
           CGO_ENABLED: 0
-          ${{ matrix.ENV }}: ""
           GOOS: ${{ matrix.GOOS }}
           GOARCH: ${{ matrix.GOARCH }}
           APP_NAME: ESurfing-go
           EXT: ${{ matrix.ext || '' }}
         run: |
+          if [ -n "${{ matrix.ENV }}" ]; then
+            export ${{ matrix.ENV }}
+          fi
           OUTPUT="dist/${APP_NAME}_${GOOS}_${GOARCH}${EXT}"
           go build -trimpath -ldflags="-s -w" -o "$OUTPUT" ./cmd/main/...          
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: universal-binaries
+          name: binaries
           path: dist/
 
   release:
@@ -162,7 +145,7 @@ jobs:
       - name: Download Artifacts
         uses: actions/download-artifact@v4
         with:
-          name: universal-binaries
+          name: binaries
           path: dist
 
       - name: Generate Checksums
@@ -175,5 +158,6 @@ jobs:
         with:
           files: |
             dist/*
+          tag_name: ${{ github.ref }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
