@@ -1,15 +1,13 @@
 # ESurfing-go
 
 golang版的广东电信天翼校园（ZSM验证）登入认证客户端
+(原版: [ESurfingDialer](https://github.com/Rsplwe/ESurfingDialer))
 
 更低的内存占用
 
 更好的路由器部署支持
 
 支持多用户 指定用户绑定指定网卡或虚拟网卡
-
-参考
-[ESurfingDialer](https://github.com/Rsplwe/ESurfingDialer)
 
 ### 运行环境
 
