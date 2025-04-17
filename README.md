@@ -16,6 +16,9 @@ golang版的广东电信天翼校园（ZSM验证）登入认证客户端
 
 ### 运行
 
+直接运行将读取运行目录下的config.json
+
+或者:
 ```shell
 ./ESurfing-go config.json
 #或者

@@ -14,7 +14,7 @@ import (
 var ClientList []*client.Client
 
 func main() {
-	fmt.Println("ESurfing-go v", Version)
+	fmt.Println("ESurfing-go ver:", Version)
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 
 	ClientList = make([]*client.Client, 0)
