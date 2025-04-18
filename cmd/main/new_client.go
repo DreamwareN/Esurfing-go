@@ -67,7 +67,7 @@ func SetDefaultConfig(c *config.Config) {
 		c.NetworkCheckIntervalMS = 3000
 	}
 	if c.MaxRetries < 0 {
-		c.MaxRetries = math.MaxInt64
+		c.MaxRetries = math.MaxUint32
 	}
 	if c.RetryDelayMS == 0 {
 		c.RetryDelayMS = 1000
