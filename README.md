@@ -15,20 +15,14 @@ golang版的广东电信天翼校园（ZSM验证）登入认证客户端
 - 内存 >= 5M
 
 ### 运行
+需要添加配置文件运行
 
-直接运行将读取运行目录下的config.json
+直接运行: 将读取运行目录下的`config.json`
 
-或者:
+指定配置文件名：
 ```shell
-./ESurfing-go config.json
-#或者
 ./ESurfing-go name_of_your_config_file.json
 ```
-
-如果参数留空那么会直接读取同级目录下的`config.json`
-
-可指定配置文件名
-
 ### 配置文件
 例子:
 
