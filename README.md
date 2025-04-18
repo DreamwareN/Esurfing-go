@@ -31,7 +31,7 @@ Feature:
     "max_retry": 100,
     "retry_delay_ms": 1000,
     "out_bound_type": "ip",
-    "network_interface_id": "",
+    "network_interface_id": "eth0",
     "network_bind_address": "100.2.180.34"
   }
 ]
