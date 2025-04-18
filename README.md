@@ -46,3 +46,16 @@ Feature:
 
 ### 特别感谢
 感谢 [Rsplwe](https://github.com/Rsplwe) 大佬的帮助
+
+### 修正openwrt环境下日志时区问题
+安装:
+```shell
+opkg update
+opkg install zoneinfo-asia
+```
+时区设置为上海:
+```shell
+ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
+```
+
+
