@@ -3,7 +3,7 @@ package client
 import "encoding/xml"
 
 const (
-	UserAgent = "CCTP/android64_vpn/2093"
+	UserAgentAndroid = "CCTP/android64_vpn/2093"
 )
 
 type TicketRequest struct {

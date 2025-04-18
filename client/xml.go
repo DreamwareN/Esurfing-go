@@ -1,6 +1,7 @@
 package client
 
 import (
+	"context"
 	"encoding/xml"
 	"io"
 	"time"
@@ -8,7 +9,7 @@ import (
 
 func (cl *Client) GenerateGetTicketXML() ([]byte, error) {
 	tr := TicketRequest{
-		UserAgent: UserAgent,
+		UserAgent: UserAgentAndroid,
 		ClientID:  cl.ClientID.String(),
 		LocalTime: time.Now().Format(time.DateTime),
 		HostName:  cl.Hostname,
@@ -26,7 +27,7 @@ func (cl *Client) GenerateGetTicketXML() ([]byte, error) {
 
 func (cl *Client) GenerateStateXML() ([]byte, error) {
 	s := &State{
-		UserAgent: UserAgent,
+		UserAgent: UserAgentAndroid,
 		ClientID:  cl.ClientID.String(),
 		LocalTime: time.Now().Format(time.DateTime),
 		HostName:  cl.Hostname,
@@ -45,7 +46,7 @@ func (cl *Client) GenerateStateXML() ([]byte, error) {
 
 func (cl *Client) GenerateLoginXML() ([]byte, error) {
 	lr := &LoginRequest{
-		UserAgent: UserAgent,
+		UserAgent: UserAgentAndroid,
 		ClientID:  cl.ClientID.String(),
 		Ticket:    cl.Ticket,
 		LocalTime: time.Now().Format(time.DateTime),
@@ -86,13 +87,15 @@ func (cl *Client) PostXML(url string, data []byte) ([]byte, error) {
 	return cl.cipher.Decrypt(data)
 }
 
-func (cl *Client) PostXMLWithoutCtx(url string, data []byte) ([]byte, error) {
+func (cl *Client) PostXMLWithSpecCtx(url string, data []byte) ([]byte, error) {
+	ctx, cancel := context.WithDeadline(context.Background(), time.Now().Add(time.Second))
+	defer cancel()
 	encXML, err := cl.cipher.Encrypt(data)
 	if err != nil {
 		return nil, err
 	}
 
-	req, err := cl.GeneratePostRequestWithoutCtx(url, encXML)
+	req, err := cl.GeneratePostRequestWithSpecCtx(ctx, url, encXML)
 	if err != nil {
 		return nil, err
 	}

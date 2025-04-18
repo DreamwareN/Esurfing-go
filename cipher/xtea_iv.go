@@ -110,7 +110,7 @@ func (x *XTeaIv) unPad(data []byte) []byte {
 
 func (x *XTeaIv) encryptBlock(v0, v1 uint32, key []uint32) (uint32, uint32) {
 	var sum int32 = 0
-	delta := 0x9E3779B9
+	delta := uint32(0x9E3779B9)
 	numRounds := 32
 
 	for i := 0; i < numRounds; i++ {
@@ -132,7 +132,7 @@ func (x *XTeaIv) encryptBlock(v0, v1 uint32, key []uint32) (uint32, uint32) {
 }
 
 func (x *XTeaIv) decryptBlock(v0, v1 uint32, key []uint32) (uint32, uint32) {
-	delta := 0x9E3779B9
+	delta := uint32(0x9E3779B9)
 	numRounds := 32
 	sum := int32(delta) * int32(numRounds)
 

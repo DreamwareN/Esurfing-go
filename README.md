@@ -1,13 +1,13 @@
-# ESurfing-go
+# Esurfing-go
 
 golang版的广东电信天翼校园（ZSM验证）登入认证客户端
 (原版: [ESurfingDialer](https://github.com/Rsplwe/ESurfingDialer))
 
-更低的内存占用
-
-更好的路由器部署支持
-
-支持多用户 指定用户绑定指定网卡或虚拟网卡
+Feature:
+- 更低的内存占用
+- 更好的路由器部署支持
+- 支持多用户
+- 支持绑定特定网卡或IP地址
 
 ### 运行环境
 
@@ -15,34 +15,34 @@ golang版的广东电信天翼校园（ZSM验证）登入认证客户端
 - 内存 >= 5M
 
 ### 运行
-需要添加配置文件运行
+直接运行: 读取运行目录下的`config.json`
 
-直接运行: 将读取运行目录下的`config.json`
-
-指定配置文件名：
+可指定配置文件名：
 ```shell
-./ESurfing-go name_of_your_config_file.json
+./Esurfing-go name_of_your_config_file.json
 ```
-### 配置文件
-例子:
-
+### 配置文件示例
 ```json
 [
   {
-    "username": "用户名1",
-    "password": "密码1",
+    "username": "用户名",
+    "password": "密码",
     "network_check_interval_ms": 1000,
     "max_retry": 100,
     "retry_delay_ms": 1000,
-    "network_interface_id": "eth0"
+    "out_bound_type": "ip",
+    "network_interface_id": "",
+    "network_bind_address": "100.2.180.34"
   }
 ]
 ```
-个别字段解释
--  `network_check_interval_ms` 检查网络的时间间隔 单位:毫秒(ms)
--  `max_retry` 登录验证的最大重试次数 设置为负数代表比如`-1`将允许无限次重试
--  `retry_delay_ms` 登录验证重试的时间间隔 单位:毫秒(ms)
--  `network_interface_id` 绑定的接口ID 留空:`""`表示使用系统默认的接口
+字段说明:
+- `network_check_interval_ms` 检查网络的时间间隔 单位:毫秒(ms)
+- `max_retry` 登录验证的最大重试次数 负数如`-1`将允许无限次重试 `0`代表不重试
+- `retry_delay_ms` 登录失败后重试的时间间隔 单位:毫秒(ms)
+- `out_bound_type` 绑定类型 `"ip"`为绑定IP `"id"`为绑定接口 留空使用则使用系统默认
+- `network_interface_id` 绑定的接口ID
+- `network_bind_address` 绑定的IP地址
 
 ### 特别感谢
 感谢 [Rsplwe](https://github.com/Rsplwe) 大佬的帮助

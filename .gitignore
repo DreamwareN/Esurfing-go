@@ -27,3 +27,5 @@ go.work.sum
 .vscode
 Esurfing-go
 config.json
+test
+test/*

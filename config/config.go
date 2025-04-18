@@ -12,7 +12,9 @@ type Config struct {
 	NetworkCheckIntervalMS int    `json:"network_check_interval_ms"`
 	MaxRetries             int    `json:"max_retry"`
 	RetryDelayMS           int    `json:"retry_delay_ms"`
+	OutBoundType           string `json:"out_bound_type"`
 	NetworkInterfaceID     string `json:"network_interface_id"`
+	NetworkBindAddress     string `json:"network_bind_address"`
 }
 
 var Conf []*Config

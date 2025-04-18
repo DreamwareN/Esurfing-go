@@ -2,15 +2,16 @@ package client
 
 import (
 	"github.com/DreamwareN/Esurfing-go/cipher"
-	"github.com/DreamwareN/Esurfing-go/client/utils"
+	"github.com/DreamwareN/Esurfing-go/errs"
+	"github.com/DreamwareN/Esurfing-go/utils"
 	"github.com/google/uuid"
 )
 
-func (cl *Client) authorization(URL string) error {
+func (cl *Client) Authorization(URL string) error {
 	log := cl.Log
 	cl.FirstRedirectURL = URL
 
-	err := cl.getSchoolInfo()
+	err := cl.GetSchoolInfo()
 	if err != nil {
 		return err
 	}
@@ -25,34 +26,36 @@ func (cl *Client) authorization(URL string) error {
 	cl.MacAddress = utils.GenerateRandomMAC()
 
 	//获取EConfig并设置TicketURL
-	err = cl.getEConfig()
+	err = cl.GetEConfig()
 	if err != nil {
 		return err
 	}
 
 	log.Println("Ticket URL: ", cl.TicketURL)
 
-	err = cl.getUserAndAcIP()
+	err = cl.GetUserAndAcIP()
 	if err != nil {
 		return err
 	}
 
 	log.Println("User IP: ", cl.UserIP)
-	log.Println("AcIP: ", cl.AcIP)
+	log.Println("Ac IP: ", cl.AcIP)
 
 	//get algo id
-	err = cl.getAlgoId()
+	err = cl.GetAlgoId()
 	if err != nil {
 		return err
 	}
 
 	cl.cipher = cipher.NewCipher(cl.AlgoID)
+	if cl.cipher == nil {
+		return errs.New("Unknown AlgoID: " + cl.AlgoID)
+	}
 
 	log.Println("Algo ID:", cl.AlgoID)
-	log.Println("Key:", cl.Key)
 
 	//get ticket
-	err = cl.getTicket()
+	err = cl.GetTicket()
 	if err != nil {
 		return err
 	}
@@ -60,7 +63,7 @@ func (cl *Client) authorization(URL string) error {
 	log.Println("Ticket: ", cl.Ticket)
 
 	//login
-	err = cl.login()
+	err = cl.Login()
 	if err != nil {
 		return err
 	}

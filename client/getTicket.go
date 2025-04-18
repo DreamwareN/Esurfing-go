@@ -5,7 +5,7 @@ import (
 	"github.com/DreamwareN/Esurfing-go/errs"
 )
 
-func (cl *Client) getTicket() error {
+func (cl *Client) GetTicket() error {
 	getTicketXML, err := cl.GenerateGetTicketXML()
 	if err != nil {
 		return errs.New(err.Error())

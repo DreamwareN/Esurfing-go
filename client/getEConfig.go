@@ -2,17 +2,17 @@ package client
 
 import (
 	"encoding/xml"
-	"github.com/DreamwareN/Esurfing-go/client/utils"
 	"github.com/DreamwareN/Esurfing-go/errs"
+	"github.com/DreamwareN/Esurfing-go/utils"
 	"io"
 )
 
-func (cl *Client) getEConfig() error {
+func (cl *Client) GetEConfig() error {
 	if cl.FirstRedirectURL == "" {
 		return errs.New("missing redirect URL")
 	}
 
-	request, err := cl.GenerateGetRequest(cl.SecondRedirectURL)
+	request, err := cl.GenerateGetRequest(cl.IndexURL)
 	if err != nil {
 		return errs.New(err.Error())
 	}

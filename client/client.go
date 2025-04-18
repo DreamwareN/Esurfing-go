@@ -22,8 +22,11 @@ type Client struct {
 	WaitGroup  *sync.WaitGroup
 	cipher     cipher.Cipher
 
-	isRunning atomic.Int32
-	isLogin   atomic.Int32
+	HeartbeatInterval  time.Duration
+	IsConnectedAtFirst int
+	IsCheckingNetwork  atomic.Int32
+	IsRunning          atomic.Int32
+	IsLogin            atomic.Int32
 
 	UserIP     string
 	AcIP       string
@@ -34,23 +37,14 @@ type Client struct {
 	Hostname   string
 	MacAddress string
 	Ticket     string
-	Key        string
 
-	AlgoID    string
-	IndexURL  string
-	TicketURL string
-	AuthURL   string
-	KeepURL   string
-	TermURL   string
-
-	FirstRedirectURL  string
-	SecondRedirectURL string
-
-	HeartbeatInterval time.Duration
-
-	//todo: remove this later
-	//《网络是否已连接》
-	isConnectedAtFirst int
+	AlgoID           string
+	IndexURL         string
+	TicketURL        string
+	AuthURL          string
+	KeepURL          string
+	TermURL          string
+	FirstRedirectURL string
 }
 
 var ErrMaxReTryReach = errors.New("max retry reached")
@@ -58,7 +52,7 @@ var ErrMaxReTryReach = errors.New("max retry reached")
 func (cl *Client) Run() {
 	cl.Log.Println("Starting client...")
 	defer cl.WaitGroup.Done()
-	defer cl.exit()
+	defer cl.Exit()
 
 	networkCheckTicker := time.NewTicker(time.Millisecond * time.Duration(cl.Conf.NetworkCheckIntervalMS))
 	defer networkCheckTicker.Stop()
@@ -66,26 +60,33 @@ func (cl *Client) Run() {
 	for {
 		select {
 		case <-networkCheckTicker.C:
-			if err := cl.checkNetworkStatus(); err != nil {
-				if errors.Is(ErrMaxReTryReach, err) {
-					cl.Log.Printf("%s exit", cl.Conf.AuthUsername)
+			//todo: useless impl:cl.IsCheckingNetwork
+			go func() {
+				if cl.IsCheckingNetwork.Load() == 0 {
+					cl.IsCheckingNetwork.Store(1)
+					defer cl.IsCheckingNetwork.Store(0)
+				} else if cl.IsCheckingNetwork.Load() == 1 {
 					return
 				}
-				cl.Log.Printf("Network check failed: %v", err)
-			}
 
+				if err := cl.CheckNetworkStatus(); err != nil {
+					if errors.Is(ErrMaxReTryReach, err) {
+						cl.Log.Printf("%s exit", cl.Conf.AuthUsername)
+						return
+					}
+					cl.Log.Printf("Network check failed: %v", err)
+				}
+
+			}()
 		case <-cl.Ctx.Done():
 			return
 		}
 	}
 }
 
-func (cl *Client) exit() {
-	if cl.isRunning.Load() == 1 && cl.isLogin.Load() == 1 {
-		if err := cl.logout(); err != nil {
-			//这里永远都是timeout 不用处理后续
-			//cl.Log.Println("logout failed: ", err.Error())
-		}
+func (cl *Client) Exit() {
+	if cl.IsRunning.Load() == 1 && cl.IsLogin.Load() == 1 {
+		_ = cl.Logout()
 	}
 	cl.Log.Println("exit")
 }

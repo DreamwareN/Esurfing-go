@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-func (cl *Client) checkNetworkStatus() error {
+func (cl *Client) CheckNetworkStatus() error {
 	request, err := cl.GenerateGetRequest("http://connect.rom.miui.com/generate_204")
 	if err != nil {
 		return errs.New(err.Error())
@@ -21,37 +21,37 @@ func (cl *Client) checkNetworkStatus() error {
 
 	switch resp.StatusCode {
 	case http.StatusNoContent:
-		cl.isRunning.Store(1)
-		if cl.isConnectedAtFirst == 0 {
-			cl.isConnectedAtFirst = 1
-			cl.Log.Println("Network has been connected")
+		cl.IsRunning.Store(1)
+		if cl.IsConnectedAtFirst == 0 {
+			cl.IsConnectedAtFirst = 1
+			cl.Log.Println("The network has been connected")
 		}
 		return nil
 
 	case http.StatusFound:
 		cl.Log.Println("Authorization required")
-		return cl.handleRedirect(resp)
+		return cl.HandleRedirect(resp)
 
 	default:
 		return errs.New(fmt.Sprintf("unexpected status code: %d", resp.StatusCode))
 	}
 }
 
-func (cl *Client) handleRedirect(resp *http.Response) error {
+func (cl *Client) HandleRedirect(resp *http.Response) error {
 	redirectURL := resp.Header.Get("Location")
 	if redirectURL == "" {
 		return errs.New("missing Location header in redirect")
 	}
 
 	retryCount := 0
-	for retryCount < cl.Conf.MaxRetries {
+	for retryCount <= cl.Conf.MaxRetries {
 		select {
 		case <-cl.Ctx.Done():
 			return errs.New("context canceled")
 		default:
 		}
 
-		if err := cl.authorization(redirectURL); err != nil {
+		if err := cl.Authorization(redirectURL); err != nil {
 			retryCount++
 			cl.Log.Printf("Authorization attempt %d failed: %v", retryCount, err)
 			select {
@@ -63,9 +63,9 @@ func (cl *Client) handleRedirect(resp *http.Response) error {
 		}
 
 		cl.Log.Println("Authorization succeeded")
-		cl.isLogin.Store(1)
-		cl.isRunning.Store(1)
-		go cl.maintainSession()
+		cl.IsLogin.Store(1)
+		cl.IsRunning.Store(1)
+		go cl.MaintainSession()
 		return nil
 	}
 

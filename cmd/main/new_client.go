@@ -5,7 +5,11 @@ import (
 	"fmt"
 	"github.com/DreamwareN/Esurfing-go/client"
 	"github.com/DreamwareN/Esurfing-go/config"
+	"github.com/DreamwareN/Esurfing-go/errs"
+	"github.com/DreamwareN/Esurfing-go/utils"
 	"log"
+	"math"
+	"net"
 	"net/http"
 	"os"
 	"sync"
@@ -16,7 +20,7 @@ func RunNewClient(c *config.Config, wg *sync.WaitGroup) error {
 
 	transport, err := NewHttpTransport(c)
 	if err != nil {
-		return fmt.Errorf("failed to create transport: %w", err)
+		return errs.New(fmt.Errorf("failed to create transport: %w", err).Error())
 	}
 
 	ctx, cancel := context.WithCancel(context.Background())
@@ -30,21 +34,82 @@ func RunNewClient(c *config.Config, wg *sync.WaitGroup) error {
 			CheckRedirect: func(req *http.Request, via []*http.Request) error {
 				return http.ErrUseLastResponse
 			},
-			//这里有待商榷 默认的timeout太大了
-			//Timeout:   time.Second * 3,
 			Transport: transport,
 		},
 		AlgoID: "00000000-0000-0000-0000-000000000000",
+		Log: log.New(
+			os.Stdout,
+			getLogPrefix(c),
+			log.LstdFlags|log.Lmsgprefix,
+		),
 	}
-
-	cl.Log = log.New(
-		os.Stdout,
-		fmt.Sprintf("[User:%s Interface:%s] ", cl.Conf.AuthUsername, cl.Conf.NetworkInterfaceID),
-		log.LstdFlags|log.Lmsgprefix,
-	)
 
 	ClientList = append(ClientList, cl)
 
 	go cl.Run()
 	return nil
+}
+
+func getLogPrefix(c *config.Config) string {
+	if c.OutBoundType == "id" {
+		return "[User:" + c.AuthUsername + " Interface:" + c.NetworkInterfaceID + "] "
+	}
+
+	if c.OutBoundType == "ip" {
+		return "[User:" + c.AuthUsername + " BindAddr:" + c.NetworkBindAddress + "] "
+	}
+
+	return "[User:" + c.AuthUsername + "] "
+}
+
+func SetDefaultConfig(c *config.Config) {
+	if c.NetworkCheckIntervalMS == 0 {
+		c.NetworkCheckIntervalMS = 3000
+	}
+	if c.MaxRetries < 0 {
+		c.MaxRetries = math.MaxInt64
+	}
+	if c.RetryDelayMS == 0 {
+		c.RetryDelayMS = 1000
+	}
+}
+
+func NewHttpTransport(c *config.Config) (http.RoundTripper, error) {
+	switch c.OutBoundType {
+	case "id":
+		if c.NetworkInterfaceID == "" {
+			return nil, errs.New("empty network interface ID")
+		}
+
+		ip, err := utils.GetInterfaceIP(c.NetworkInterfaceID)
+		if err != nil {
+			return nil, errs.New(fmt.Errorf("failed to get interface IP: %w", err).Error())
+		}
+
+		localAddr := &net.TCPAddr{IP: net.ParseIP(ip)}
+		return &http.Transport{
+			DialContext: (&net.Dialer{
+				LocalAddr: localAddr,
+			}).DialContext,
+		}, nil
+
+	case "ip":
+		if c.NetworkBindAddress == "" {
+			return nil, errs.New("empty network bind address")
+		}
+
+		ip := net.ParseIP(c.NetworkBindAddress)
+		if ip == nil {
+			return nil, errs.New("invalid network bind address")
+		}
+
+		localAddr := &net.TCPAddr{IP: ip}
+		return &http.Transport{
+			DialContext: (&net.Dialer{
+				LocalAddr: localAddr,
+			}).DialContext,
+		}, nil
+	default:
+		return http.DefaultTransport, nil
+	}
 }

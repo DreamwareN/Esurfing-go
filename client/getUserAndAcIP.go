@@ -5,7 +5,7 @@ import (
 	"net/url"
 )
 
-func (cl *Client) getUserAndAcIP() error {
+func (cl *Client) GetUserAndAcIP() error {
 	URLParsed, err := url.Parse(cl.TicketURL)
 	if err != nil {
 		return errs.New(err.Error())

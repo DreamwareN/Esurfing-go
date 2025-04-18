@@ -1,12 +1,12 @@
 package client
 
 import (
-	"github.com/DreamwareN/Esurfing-go/client/utils"
 	"github.com/DreamwareN/Esurfing-go/errs"
+	"github.com/DreamwareN/Esurfing-go/utils"
 	"io"
 )
 
-func (cl *Client) getAlgoId() error {
+func (cl *Client) GetAlgoId() error {
 	request, err := cl.GeneratePostRequest(cl.TicketURL, []byte(cl.AlgoID))
 	if err != nil {
 		return errs.New(err.Error())
@@ -24,7 +24,7 @@ func (cl *Client) getAlgoId() error {
 		return errs.New(err.Error())
 	}
 
-	cl.AlgoID, cl.Key, err = utils.DecodeAlgoID(algoIdData)
+	cl.AlgoID, _, err = utils.DecodeAlgoID(algoIdData)
 	if err != nil {
 		return errs.New(err.Error())
 	}

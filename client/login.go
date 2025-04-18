@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-func (cl *Client) login() error {
+func (cl *Client) Login() error {
 	loginXML, err := cl.GenerateLoginXML()
 	if err != nil {
 		return errs.New(err.Error())

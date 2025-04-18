@@ -2,13 +2,14 @@ package main
 
 import (
 	"fmt"
-	"github.com/DreamwareN/Esurfing-go/client"
-	"github.com/DreamwareN/Esurfing-go/config"
 	"log"
 	"os"
 	"os/signal"
 	"sync"
 	"syscall"
+
+	"github.com/DreamwareN/Esurfing-go/client"
+	"github.com/DreamwareN/Esurfing-go/config"
 )
 
 var ClientList []*client.Client
@@ -60,7 +61,10 @@ func main() {
 
 	log.Println("Shutting down...")
 	for _, cl := range ClientList {
-		cl.Cancel()
+		go func() {
+			cl.Cancel()
+			cl.HttpClient.CloseIdleConnections()
+		}()
 	}
 	wg.Wait()
 	log.Println("Goodbye!")

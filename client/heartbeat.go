@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-func (cl *Client) sendHeartbeat() error {
+func (cl *Client) SendHeartbeat() error {
 	stateXML, err := cl.GenerateStateXML()
 	if err != nil {
 		return errs.New(err.Error())

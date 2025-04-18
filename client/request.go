@@ -2,6 +2,7 @@ package client
 
 import (
 	"bytes"
+	"context"
 	"crypto/md5"
 	"encoding/hex"
 	"net/http"
@@ -13,7 +14,7 @@ func (cl *Client) GenerateGetRequest(url string) (request *http.Request, err err
 		return nil, err
 	}
 
-	req.Header.Set("User-Agent", UserAgent)
+	req.Header.Set("User-Agent", UserAgentAndroid)
 	req.Header.Set("Accept", "text/html,text/xml,application/xhtml+xml,application/x-javascript,*/*")
 	req.Header.Set("Client-ID", cl.ClientID.String())
 	req.Header.Set("Connection", "keep-alive")
@@ -37,7 +38,7 @@ func (cl *Client) GeneratePostRequest(url string, data []byte) (request *http.Re
 	if err != nil {
 		return nil, err
 	}
-	req.Header.Set("User-Agent", UserAgent)
+	req.Header.Set("User-Agent", UserAgentAndroid)
 	req.Header.Set("Accept", "text/html,text/xml,application/xhtml+xml,application/x-javascript,*/*")
 	req.Header.Set("Client-ID", cl.ClientID.String())
 	req.Header.Set("CDC-Checksum", hex.EncodeToString(md5Hex[:]))
@@ -45,14 +46,14 @@ func (cl *Client) GeneratePostRequest(url string, data []byte) (request *http.Re
 	return req, nil
 }
 
-func (cl *Client) GeneratePostRequestWithoutCtx(url string, data []byte) (request *http.Request, err error) {
+func (cl *Client) GeneratePostRequestWithSpecCtx(ctx context.Context, url string, data []byte) (request *http.Request, err error) {
 	md5Hex := md5.Sum(data)
 
-	req, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(data))
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, url, bytes.NewBuffer(data))
 	if err != nil {
 		return nil, err
 	}
-	req.Header.Set("User-Agent", UserAgent)
+	req.Header.Set("User-Agent", UserAgentAndroid)
 	req.Header.Set("Accept", "text/html,text/xml,application/xhtml+xml,application/x-javascript,*/*")
 	req.Header.Set("Client-ID", cl.ClientID.String())
 	req.Header.Set("CDC-Checksum", hex.EncodeToString(md5Hex[:]))

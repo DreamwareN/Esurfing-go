@@ -1,12 +1,12 @@
 package client
 
-func (cl *Client) logout() error {
+func (cl *Client) Logout() error {
 	stateXML, err := cl.GenerateStateXML()
 	if err != nil {
 		return err
 	}
 
-	_, err = cl.PostXMLWithoutCtx(cl.TermURL, stateXML)
+	_, err = cl.PostXMLWithSpecCtx(cl.TermURL, stateXML)
 	if err != nil {
 		return err
 	}
