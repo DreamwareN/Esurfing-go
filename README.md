@@ -3,24 +3,28 @@
 golang版的广东电信天翼校园（ZSM验证）登入认证客户端
 (原版: [ESurfingDialer](https://github.com/Rsplwe/ESurfingDialer))
 
-Feature:
-- 更低的内存占用
-- 更好的路由器部署支持
-- 支持多用户
-- 支持绑定特定网卡或IP地址
+[![Go Version](https://img.shields.io/badge/Go-1.24.2-blue)](https://golang.org/)
+[![License](https://img.shields.io/badge/License-Apache2.0-green)](LICENSE)
 
-### 运行环境
-
-- 不限
-- 内存 >= 5M
+### Feature:
+- 内存占用 < 10MB
+- 原生平台支持 适配 openwrt/x64/x86/arm/mips 等环境
+- 路由器部署支持
+    - 支持多账号配置
+    - 网卡/IP 绑定功能
 
 ### 运行
-直接运行: 读取运行目录下的`config.json`
-
-可指定配置文件名：
+直接运行（默认加载 config.json）
 ```shell
-./Esurfing-go name_of_your_config_file.json
+chmod +x Esurfing-go
+./Esurfing-go
 ```
+
+指定配置文件
+```shell
+./Esurfing-go custom_config.json
+```
+
 ### 配置文件示例
 ```json
 [
@@ -32,30 +36,33 @@ Feature:
     "retry_delay_ms": 1000,
     "out_bound_type": "ip",
     "network_interface_id": "eth0",
-    "network_bind_address": "100.2.180.34"
+    "network_bind_address": "192.168.1.100"
   }
 ]
 ```
-字段说明:
-- `network_check_interval_ms` 检查网络的时间间隔 单位:毫秒(ms)
-- `max_retry` 登录验证的最大重试次数 负数如`-1`将允许无限次重试 `0`代表不重试
-- `retry_delay_ms` 登录失败后重试的时间间隔 单位:毫秒(ms)
-- `out_bound_type` 绑定类型 `"ip"`为绑定IP `"id"`为绑定接口 留空使用则使用系统默认
-- `network_interface_id` 绑定的接口ID
-- `network_bind_address` 绑定的IP地址
+### 配置参数
 
-### 特别感谢
-感谢 [Rsplwe](https://github.com/Rsplwe) 大佬的帮助
+| field                       | 类型     | 默认值  | 说明                                     |
+|-----------------------------|--------|------|----------------------------------------|
+| `username`                  | string | 必填   | 用户名                                    |
+| `password`                  | string | 必填   | 密码                                     |
+| `network_check_interval_ms` | int    | 1000 | 网络状态检测间隔(毫秒)                           |
+| `max_retry`                 | int    | 0    | 登录最大重试次数(-1=无限重试，0=不重试)                |
+| `retry_delay_ms`            | int    | 1000 | 登录失败重试间隔(毫秒)                           |
+| `out_bound_type`            | string | 无    | 出口绑定类型:`ip`-IP绑定 / `id`-网卡绑定 / 留空-系统默认 |
+| `network_interface_id`      | string | 无    | 绑定的网络接口名称(如 eth0)                      |
+| `network_bind_address`      | string | 无    | 绑定的 IP 地址                              |
 
-### 修正openwrt环境下日志时区问题
-安装:
+### openwrt golang日志时区修复
 ```shell
 opkg update
 opkg install zoneinfo-asia
 ```
-时区设置为上海:
 ```shell
+#时区设置为上海
 ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
 ```
 
+### 致谢
+特别感谢 [Rsplwe](https://github.com/Rsplwe) 的关键贡献。
 

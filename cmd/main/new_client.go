@@ -64,7 +64,7 @@ func getLogPrefix(c *config.Config) string {
 
 func SetDefaultConfig(c *config.Config) {
 	if c.NetworkCheckIntervalMS == 0 {
-		c.NetworkCheckIntervalMS = 3000
+		c.NetworkCheckIntervalMS = 1000
 	}
 	if c.MaxRetries < 0 {
 		c.MaxRetries = math.MaxInt32
