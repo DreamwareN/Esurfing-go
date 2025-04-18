@@ -40,8 +40,6 @@ jobs:
             GOARCH: ppc64le
           - GOOS: linux
             GOARCH: riscv64
-          - GOOS: linux
-            GOARCH: s390x
 
           # Windows
           - GOOS: windows
@@ -88,8 +86,7 @@ jobs:
             GOARCH: arm
           - GOOS: openbsd
             GOARCH: arm64
-          - GOOS: openbsd
-            GOARCH: mips64
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
