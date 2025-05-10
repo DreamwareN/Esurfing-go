@@ -59,7 +59,7 @@ func main() {
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGHUP)
 	<-sigs
 
-	log.Println("Shutting down...")
+	log.Println("shutting down...")
 	for _, cl := range ClientList {
 		go func() {
 			cl.Cancel()
@@ -67,5 +67,5 @@ func main() {
 		}()
 	}
 	wg.Wait()
-	log.Println("Goodbye!")
+	log.Println("bye")
 }

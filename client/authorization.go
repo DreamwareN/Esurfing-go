@@ -16,10 +16,8 @@ func (cl *Client) Authorization(URL string) error {
 		return err
 	}
 
-	log.Println("Domain: ", cl.Domain)
-	log.Println("Area: ", cl.Area)
-	log.Println("School Id: ", cl.SchoolID)
-	log.Println("Index URL: ", cl.IndexURL)
+	log.Printf("Domain:%s Area:%s SchoolID:%s", cl.Domain, cl.Area, cl.SchoolID)
+	log.Println("Index URL:", cl.IndexURL)
 
 	cl.ClientID = uuid.New()
 	cl.Hostname = utils.GenerateRandomString(10)
@@ -31,15 +29,14 @@ func (cl *Client) Authorization(URL string) error {
 		return err
 	}
 
-	log.Println("Ticket URL: ", cl.TicketURL)
+	log.Println("Ticket URL:", cl.TicketURL)
 
 	err = cl.GetUserAndAcIP()
 	if err != nil {
 		return err
 	}
 
-	log.Println("User IP: ", cl.UserIP)
-	log.Println("Ac IP: ", cl.AcIP)
+	log.Printf("UserIP:%s AcIP:%s", cl.UserIP, cl.AcIP)
 
 	//get algo id
 	err = cl.GetAlgoId()
@@ -49,7 +46,7 @@ func (cl *Client) Authorization(URL string) error {
 
 	cl.cipher = cipher.NewCipher(cl.AlgoID)
 	if cl.cipher == nil {
-		return errs.New("Unknown AlgoID: " + cl.AlgoID)
+		return errs.New("Unknown AlgoID:" + cl.AlgoID)
 	}
 
 	log.Println("Algo ID:", cl.AlgoID)
@@ -60,7 +57,7 @@ func (cl *Client) Authorization(URL string) error {
 		return err
 	}
 
-	log.Println("Ticket: ", cl.Ticket)
+	log.Println("Ticket:", cl.Ticket)
 
 	//login
 	err = cl.Login()
@@ -68,8 +65,8 @@ func (cl *Client) Authorization(URL string) error {
 		return err
 	}
 
-	log.Println("Keep URL:", cl.KeepURL)
-	log.Println("Term URL:", cl.TermURL)
+	//log.Println("Keep URL:", cl.KeepURL)
+	//log.Println("Term URL:", cl.TermURL)
 
 	return nil
 }

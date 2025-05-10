@@ -29,3 +29,4 @@ Esurfing-go
 config.json
 test
 test/*
+*.json

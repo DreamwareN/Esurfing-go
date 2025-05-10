@@ -8,12 +8,18 @@ golang版的广东电信天翼校园（ZSM验证）登入认证客户端
 
 ### Feature:
 - 内存占用 < 10MB
-- 原生平台支持 适配 openwrt/x64/x86/arm/mips 等环境
+- 多平台支持 支持 openwrt/windows/mac/linux
 - 路由器部署支持
     - 支持多账号配置
     - 网卡/IP 绑定功能
 
 ### 运行
+请下载对应平台的的对应架构的二进制文件
+
+- **一般**的路由器都是arm芯片,下载缀为arm64的文件,老一点的处理器下普通arm的就行,有些远古指令集自己编译吧 :)
+
+(不清楚的在issue问吧 这么多设备我也列不出来)
+
 直接运行（默认加载 config.json）
 ```shell
 chmod +x Esurfing-go
@@ -47,7 +53,7 @@ chmod +x Esurfing-go
 | `username`                  | string | 必填   | 用户名                                    |
 | `password`                  | string | 必填   | 密码                                     |
 | `network_check_interval_ms` | int    | 1000 | 网络状态检测间隔(毫秒)                           |
-| `max_retry`                 | int    | 0    | 登录最大重试次数(-1=无限重试，0=不重试)                |
+| `max_retry`                 | int    | 0    | 登录失败后最大重试次数(-1=无限重试，0=不重试)             |
 | `retry_delay_ms`            | int    | 1000 | 登录失败重试间隔(毫秒)                           |
 | `out_bound_type`            | string | 无    | 出口绑定类型:`ip`-IP绑定 / `id`-网卡绑定 / 留空-系统默认 |
 | `network_interface_id`      | string | 无    | 绑定的网络接口名称(如 eth0)                      |

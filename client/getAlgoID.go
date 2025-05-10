@@ -28,5 +28,6 @@ func (cl *Client) GetAlgoId() error {
 	if err != nil {
 		return errs.New(err.Error())
 	}
+
 	return nil
 }
