@@ -30,3 +30,4 @@ config.json
 test
 test/*
 *.json
+config.toml

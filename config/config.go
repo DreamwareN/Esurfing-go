@@ -15,6 +15,8 @@ type Config struct {
 	OutBoundType           string `json:"out_bound_type"`
 	NetworkInterfaceID     string `json:"network_interface_id"`
 	NetworkBindAddress     string `json:"network_bind_address"`
+	UseCustomDns           bool   `json:"use_custom_dns"`
+	DnsAddress             string `json:"dns_address"`
 }
 
 var Conf []*Config

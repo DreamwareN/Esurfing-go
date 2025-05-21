@@ -13,6 +13,7 @@ import (
 	"net/http"
 	"os"
 	"sync"
+	"time"
 )
 
 func RunNewClient(c *config.Config, wg *sync.WaitGroup) error {
@@ -90,6 +91,7 @@ func NewHttpTransport(c *config.Config) (http.RoundTripper, error) {
 		return &http.Transport{
 			DialContext: (&net.Dialer{
 				LocalAddr: localAddr,
+				Resolver:  GetResolver(c),
 			}).DialContext,
 		}, nil
 
@@ -107,9 +109,34 @@ func NewHttpTransport(c *config.Config) (http.RoundTripper, error) {
 		return &http.Transport{
 			DialContext: (&net.Dialer{
 				LocalAddr: localAddr,
+				Resolver:  GetResolver(c),
 			}).DialContext,
 		}, nil
 	default:
-		return http.DefaultTransport, nil
+		return &http.Transport{
+			DialContext: (&net.Dialer{
+				Resolver: GetResolver(c),
+			}).DialContext,
+		}, nil
+	}
+}
+
+func GetResolver(c *config.Config) *net.Resolver {
+	if !c.UseCustomDns {
+		return net.DefaultResolver
+	}
+
+	if c.DnsAddress == "" {
+		return net.DefaultResolver
+	}
+
+	return &net.Resolver{
+		PreferGo: true,
+		Dial: func(ctx context.Context, network, address string) (net.Conn, error) {
+			d := net.Dialer{
+				Timeout: 5 * time.Second,
+			}
+			return d.DialContext(ctx, "udp", c.DnsAddress+":53")
+		},
 	}
 }
