@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"log"
 	"os"
@@ -15,6 +16,9 @@ import (
 var ClientList []*client.Client
 
 func main() {
+	var configFilePath = flag.String("c", "config.json", "config file path")
+	flag.Parse()
+
 	fmt.Println("ESurfing-go ver:", Version)
 	log.SetFlags(log.LstdFlags | log.Lshortfile)
 
@@ -23,29 +27,12 @@ func main() {
 
 	log.Println("reading config...")
 
-	var err error
-	if len(os.Args) == 1 {
-		err = config.LoadConfig("config.json")
-	} else if len(os.Args) == 2 {
-		if os.Args[1] != "" {
-			err = config.LoadConfig(os.Args[1])
-		}
-	}
+	err := config.LoadConfig(*configFilePath)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	log.Printf("%d account(s) loaded from config: %s", len(config.Conf), func() string {
-		if len(os.Args) == 1 {
-			return "config.json"
-		} else {
-			if len(os.Args) == 2 {
-				return os.Args[1]
-			} else {
-				return "?"
-			}
-		}
-	}())
+	log.Printf("%d account(s) loaded from config: %s", len(config.Conf), *configFilePath)
 
 	for _, c := range config.Conf {
 		wg.Add(1)

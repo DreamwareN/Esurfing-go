@@ -1,4 +1,6 @@
 github.com/emmansun/gmsm v0.30.1 h1:IEBk+r4hcfVviNH1Q8KlMfreeIUnhZchMtsAgc7MsSI=
 github.com/emmansun/gmsm v0.30.1/go.mod h1:XRXzKUpqVGZy9ynVKPE8xFuKaPi8jtzk4ZEFG6/WewY=
+github.com/emmansun/gmsm v0.34.1 h1:7eMyHjB0AeoSZ+sB3FZE9gZOJBZFbtY0tmWJdVFkfc0=
+github.com/emmansun/gmsm v0.34.1/go.mod h1:NtH8X3s0ywBIICiOHD6Jj6P4brHHN6qUOI/nSK/x1jQ=
 github.com/google/uuid v1.6.0 h1:NIvaJDMOsjHA8n1jAhLSgzrAzy1Hgr+hNrb57e+94F0=
 github.com/google/uuid v1.6.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
