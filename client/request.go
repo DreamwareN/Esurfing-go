@@ -8,45 +8,45 @@ import (
 	"net/http"
 )
 
-func (cl *Client) GenerateGetRequest(url string) (request *http.Request, err error) {
-	req, err := http.NewRequestWithContext(cl.Ctx, http.MethodGet, url, nil)
+func (c *Client) NewGetRequest(url string) (request *http.Request, err error) {
+	req, err := http.NewRequestWithContext(c.Ctx, http.MethodGet, url, nil)
 	if err != nil {
 		return nil, err
 	}
 
 	req.Header.Set("User-Agent", UserAgentAndroid)
 	req.Header.Set("Accept", "text/html,text/xml,application/xhtml+xml,application/x-javascript,*/*")
-	req.Header.Set("Client-ID", cl.ClientID.String())
+	req.Header.Set("Client-ID", c.ClientID.String())
 	req.Header.Set("Connection", "keep-alive")
-	if cl.SchoolID != "" {
-		req.Header.Set("CDC-SchoolId", cl.SchoolID)
+	if c.SchoolID != "" {
+		req.Header.Set("CDC-SchoolId", c.SchoolID)
 	}
-	if cl.Domain != "" {
-		req.Header.Set("CDC-Domain", cl.Domain)
+	if c.Domain != "" {
+		req.Header.Set("CDC-Domain", c.Domain)
 	}
-	if cl.Area != "" {
-		req.Header.Set("CDC-Area", cl.Area)
+	if c.Area != "" {
+		req.Header.Set("CDC-Area", c.Area)
 	}
 
 	return req, nil
 }
 
-func (cl *Client) GeneratePostRequest(url string, data []byte) (request *http.Request, err error) {
+func (c *Client) NewPostRequest(url string, data []byte) (request *http.Request, err error) {
 	md5Hex := md5.Sum(data)
 
-	req, err := http.NewRequestWithContext(cl.Ctx, http.MethodPost, url, bytes.NewBuffer(data))
+	req, err := http.NewRequestWithContext(c.Ctx, http.MethodPost, url, bytes.NewBuffer(data))
 	if err != nil {
 		return nil, err
 	}
 	req.Header.Set("User-Agent", UserAgentAndroid)
 	req.Header.Set("Accept", "text/html,text/xml,application/xhtml+xml,application/x-javascript,*/*")
-	req.Header.Set("Client-ID", cl.ClientID.String())
+	req.Header.Set("Client-ID", c.ClientID.String())
 	req.Header.Set("CDC-Checksum", hex.EncodeToString(md5Hex[:]))
-	req.Header.Set("Algo-ID", cl.AlgoID)
+	req.Header.Set("Algo-ID", c.AlgoID)
 	return req, nil
 }
 
-func (cl *Client) GeneratePostRequestWithSpecCtx(ctx context.Context, url string, data []byte) (request *http.Request, err error) {
+func (c *Client) NewPostRequestWithCustomCtx(ctx context.Context, url string, data []byte) (request *http.Request, err error) {
 	md5Hex := md5.Sum(data)
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodPost, url, bytes.NewBuffer(data))
@@ -55,8 +55,8 @@ func (cl *Client) GeneratePostRequestWithSpecCtx(ctx context.Context, url string
 	}
 	req.Header.Set("User-Agent", UserAgentAndroid)
 	req.Header.Set("Accept", "text/html,text/xml,application/xhtml+xml,application/x-javascript,*/*")
-	req.Header.Set("Client-ID", cl.ClientID.String())
+	req.Header.Set("Client-ID", c.ClientID.String())
 	req.Header.Set("CDC-Checksum", hex.EncodeToString(md5Hex[:]))
-	req.Header.Set("Algo-ID", cl.AlgoID)
+	req.Header.Set("Algo-ID", c.AlgoID)
 	return req, nil
 }

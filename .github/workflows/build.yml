@@ -13,15 +13,11 @@ jobs:
         include:
           # Linux
           - GOOS: linux
-            GOARCH: 386
-          - GOOS: linux
             GOARCH: amd64
           - GOOS: linux
             GOARCH: arm
           - GOOS: linux
             GOARCH: arm64
-          - GOOS: linux
-            GOARCH: loong64
           - GOOS: linux
             GOARCH: mips
             ENV: GOMIPS=softfloat
@@ -35,21 +31,11 @@ jobs:
             GOARCH: mips64le
             ENV: GOMIPS=softfloat
           - GOOS: linux
-            GOARCH: ppc64
-          - GOOS: linux
-            GOARCH: ppc64le
-          - GOOS: linux
             GOARCH: riscv64
 
           # Windows
           - GOOS: windows
-            GOARCH: 386
-            ext: .exe
-          - GOOS: windows
             GOARCH: amd64
-            ext: .exe
-          - GOOS: windows
-            GOARCH: arm
             ext: .exe
           - GOOS: windows
             GOARCH: arm64
@@ -61,32 +47,6 @@ jobs:
           - GOOS: darwin
             GOARCH: arm64
 
-          # BSD
-          - GOOS: freebsd
-            GOARCH: 386
-          - GOOS: freebsd
-            GOARCH: amd64
-          - GOOS: freebsd
-            GOARCH: arm
-          - GOOS: freebsd
-            GOARCH: arm64
-          - GOOS: netbsd
-            GOARCH: 386
-          - GOOS: netbsd
-            GOARCH: amd64
-          - GOOS: netbsd
-            GOARCH: arm
-          - GOOS: netbsd
-            GOARCH: arm64
-          - GOOS: openbsd
-            GOARCH: 386
-          - GOOS: openbsd
-            GOARCH: amd64
-          - GOOS: openbsd
-            GOARCH: arm
-          - GOOS: openbsd
-            GOARCH: arm64
-
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -94,7 +54,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.25.2'
+          go-version: '1.25.3'
           check-latest: true
 
       - name: Prepare Build Environment

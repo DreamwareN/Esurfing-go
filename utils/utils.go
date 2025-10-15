@@ -98,10 +98,10 @@ func DecodeAlgoID(data []byte) (algoID string, key string, err error) {
 const ConfigStartTag = "<!--//config.campus.js.chinatelecom.com "
 const ConfigEndTag = "//config.campus.js.chinatelecom.com-->"
 
-func ParseEConfig(data []byte) ([]byte, error) {
+func FormatEConfig(data []byte) ([]byte, error) {
 	str1 := strings.Split(string(data), ConfigStartTag)
 	str2 := strings.Split(str1[1], ConfigEndTag)
-	
+
 	str3 := strings.ReplaceAll(str2[0], "&width=0", "")
 	str4 := strings.ReplaceAll(str3, "&adtype=0", "")
 
