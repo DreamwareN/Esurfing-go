@@ -10,7 +10,6 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
-	"runtime/pprof"
 	"sync"
 	"syscall"
 	"time"
@@ -24,13 +23,13 @@ var ClientList []*client.Client
 
 func main() {
 	var err error
-	f1, err := os.Create("./prof/p1.prof")
+	//f1, err := os.Create("./prof/p1.prof")
 
-	err = pprof.StartCPUProfile(f1)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer pprof.StopCPUProfile()
+	//err = pprof.StartCPUProfile(f1)
+	//if err != nil {
+	//	log.Fatal(err)
+	//}
+	//defer pprof.StopCPUProfile()
 
 	var configFilePath = flag.String("c", "config.json", "config file path")
 	flag.Parse()

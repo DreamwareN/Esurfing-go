@@ -1,7 +1,6 @@
-# （请看旧版本5月22号的readme，现在这个还没写）Esurfing-go
-
-广东电信天翼校园（ZSM验证）登入认证客户端
-(原版已经被删库了...)
+# Esurfing-go
+广|东|电|信|天|翼|校|园|登|入|认|证|客|户|端
+(原版已经删库了)
 
 ### 特性
 
@@ -29,8 +28,8 @@
   {
     "username": "10001234",
     "password": "12345678",
-    "check_interval":"0",
-    "retry_interval":"0",
+    "check_interval":0,
+    "retry_interval":0,
     "bind_device":"eth1",
     "dns_address": "119.29.29.29:53"
   }
