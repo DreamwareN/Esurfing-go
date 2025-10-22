@@ -1,4 +1,4 @@
-package client
+package main
 
 import (
 	"encoding/xml"
@@ -8,8 +8,6 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/DreamwareN/Esurfing-go/cipher"
-	"github.com/DreamwareN/Esurfing-go/utils"
 	"github.com/google/uuid"
 )
 
@@ -23,8 +21,8 @@ func (c *Client) Auth(URL string) error {
 	}
 
 	c.ClientID = uuid.New()
-	c.Hostname = utils.GenerateRandomString(10)
-	c.MacAddress = utils.GenerateRandomMAC()
+	c.Hostname = GenerateRandomString(10)
+	c.MacAddress = GenerateRandomMAC()
 
 	err = c.GetEConfig()
 	if err != nil {
@@ -41,7 +39,7 @@ func (c *Client) Auth(URL string) error {
 		return err
 	}
 
-	c.cipher = cipher.NewCipher(c.AlgoID)
+	c.cipher = NewCipher(c.AlgoID)
 	if c.cipher == nil {
 		return errors.New("Unknown AlgoID:" + c.AlgoID)
 	}
@@ -94,14 +92,16 @@ func (c *Client) GetEConfig() error {
 		return errors.New(err.Error())
 	}
 
-	defer response.Body.Close()
+	defer func(Body io.ReadCloser) {
+		_ = Body.Close()
+	}(response.Body)
 
 	data, err := io.ReadAll(response.Body)
 	if err != nil {
 		return errors.New(err.Error())
 	}
 
-	eConfigData, err := utils.FormatEConfig(data)
+	eConfigData, err := FormatEConfig(data)
 	if err != nil {
 		return errors.New(err.Error())
 	}
@@ -162,14 +162,16 @@ func (c *Client) GetAlgoId() error {
 		return errors.New(err.Error())
 	}
 
-	defer response.Body.Close()
+	defer func(Body io.ReadCloser) {
+		_ = Body.Close()
+	}(response.Body)
 
 	algoIdData, err := io.ReadAll(response.Body)
 	if err != nil {
 		return errors.New(err.Error())
 	}
 
-	c.AlgoID, _, err = utils.DecodeAlgoID(algoIdData)
+	c.AlgoID, _, err = DecodeAlgoID(algoIdData)
 	if err != nil {
 		return errors.New(err.Error())
 	}

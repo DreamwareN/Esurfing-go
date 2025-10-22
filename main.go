@@ -13,13 +13,9 @@ import (
 	"sync"
 	"syscall"
 	"time"
-
-	"github.com/DreamwareN/Esurfing-go/client"
-	"github.com/DreamwareN/Esurfing-go/config"
-	"github.com/DreamwareN/Esurfing-go/utils"
 )
 
-var ClientList []*client.Client
+var ClientList []*Client
 
 func main() {
 	var err error
@@ -31,26 +27,26 @@ func main() {
 	//}
 	//defer pprof.StopCPUProfile()
 
-	var configFilePath = flag.String("c", "config.json", "config file path")
+	var configFilePath = flag.String("c", "json", "config file path")
 	flag.Parse()
 
 	fmt.Println("esurfing client v25.10.15")
 
-	ClientList = []*client.Client{}
+	ClientList = []*Client{}
 
 	log.Println("reading config")
 
-	err = config.LoadConfig(*configFilePath)
+	err = LoadConfig(*configFilePath)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	log.Printf("load %d from:%s", len(config.List), *configFilePath)
+	log.Printf("load %d from:%s", len(List), *configFilePath)
 
 	ctx, cancel := context.WithCancel(context.Background())
 	wg := sync.WaitGroup{}
 
-	for _, c := range config.List {
+	for _, c := range List {
 		wg.Add(1)
 		err := RunNewClient(c, &wg, ctx)
 		if err != nil {
@@ -72,13 +68,13 @@ func main() {
 	wg.Wait()
 }
 
-func RunNewClient(c *config.Config, wg *sync.WaitGroup, ctx context.Context) error {
+func RunNewClient(c *Config, wg *sync.WaitGroup, ctx context.Context) error {
 	transport, err := NewHttpTransport(c)
 	if err != nil {
 		return errors.New(fmt.Errorf("failed to create transport: %w", err).Error())
 	}
 
-	cl := &client.Client{
+	cl := &Client{
 		Config: c,
 		Ctx:    ctx,
 		Wg:     wg,
@@ -102,7 +98,7 @@ func RunNewClient(c *config.Config, wg *sync.WaitGroup, ctx context.Context) err
 	return nil
 }
 
-func getLogPrefix(c *config.Config) string {
+func getLogPrefix(c *Config) string {
 	return "User:" + c.Username + " BindDevice:" + func() string {
 		if c.BindDevice != "" {
 			return c.BindDevice
@@ -111,9 +107,9 @@ func getLogPrefix(c *config.Config) string {
 	}() + " "
 }
 
-func NewHttpTransport(c *config.Config) (http.RoundTripper, error) {
+func NewHttpTransport(c *Config) (http.RoundTripper, error) {
 	if c.BindDevice != "" {
-		ip, err := utils.GetInterfaceIP(c.BindDevice)
+		ip, err := GetInterfaceIP(c.BindDevice)
 		if err != nil {
 			return nil, errors.New(fmt.Errorf("failed to get interface IP: %w", err).Error())
 		}
@@ -134,7 +130,7 @@ func NewHttpTransport(c *config.Config) (http.RoundTripper, error) {
 	}
 }
 
-func GetResolver(c *config.Config) *net.Resolver {
+func GetResolver(c *Config) *net.Resolver {
 	if c.DnsAddress == "" {
 		return net.DefaultResolver
 	}

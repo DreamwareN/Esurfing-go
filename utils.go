@@ -1,9 +1,9 @@
-package utils
+package main
 
 import (
-	"crypto/rand"
 	"errors"
 	"fmt"
+	"math/rand/v2"
 	"net"
 	"strings"
 )
@@ -11,53 +11,63 @@ import (
 func GetInterfaceIP(interfaceName string) (string, error) {
 	iFace, err := net.InterfaceByName(interfaceName)
 	if err != nil {
-		return "", fmt.Errorf("interface unexist: %v", err)
+		return "", fmt.Errorf("interface not found: %v", err)
+	}
+
+	if iFace.Flags&net.FlagUp == 0 {
+		return "", fmt.Errorf("interface %s is down", interfaceName)
 	}
 
 	addresses, err := iFace.Addrs()
 	if err != nil {
-		return "", fmt.Errorf("can not get interface IP: %v", err)
+		return "", fmt.Errorf("can not get addresses from interface %s: %v", interfaceName, err)
 	}
 
 	for _, addr := range addresses {
-		ipNet, ok := addr.(*net.IPNet)
-		if !ok {
+		var ip net.IP
+		switch v := addr.(type) {
+		case *net.IPNet:
+			ip = v.IP
+		case *net.IPAddr:
+			ip = v.IP
+		default:
 			continue
 		}
-		ip := ipNet.IP
-		if ip.IsLoopback() || ip.IsLinkLocalUnicast() {
+
+		if ip == nil || ip.IsLoopback() || ip.IsLinkLocalUnicast() {
 			continue
 		}
-		if ip.To4() != nil {
-			return ip.String(), nil
+
+		ipv4 := ip.To4()
+		if ipv4 == nil {
+			continue
 		}
+
+		return ipv4.String(), nil
 	}
 
-	return "", fmt.Errorf("no available ip at interface %s", interfaceName)
+	return "", fmt.Errorf("no available ipv4 address at interface %s", interfaceName)
 }
 
-func GenerateRandomString(length int) string {
-	const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-	bytes := make([]byte, length)
+const charset = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 
-	_, err := rand.Read(bytes)
-	if err != nil {
+func GenerateRandomString(length int) string {
+	if length <= 0 {
 		return ""
 	}
 
-	for i := 0; i < length; i++ {
-		bytes[i] = charset[int(bytes[i])%len(charset)]
+	b := make([]byte, length)
+	for i := range b {
+		b[i] = charset[rand.N(len(charset))]
 	}
-
-	return string(bytes)
+	return string(b)
 }
 
 func GenerateRandomMAC() string {
 	mac := make([]byte, 6)
 
-	_, err := rand.Read(mac)
-	if err != nil {
-		return ""
+	for i := range mac {
+		mac[i] = byte(rand.N(256))
 	}
 
 	mac[0] = (mac[0] & 0xfe) | 0x02

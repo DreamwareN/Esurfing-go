@@ -1,26 +1,25 @@
-package client
+package main
 
 import (
 	"context"
 	"errors"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"sync"
 	"time"
 
-	"github.com/DreamwareN/Esurfing-go/cipher"
-	"github.com/DreamwareN/Esurfing-go/config"
 	"github.com/google/uuid"
 )
 
 type Client struct {
-	Config     *config.Config
+	Config     *Config
 	Log        *log.Logger
 	HttpClient *http.Client
 	Ctx        context.Context
 	Wg         *sync.WaitGroup
-	cipher     cipher.Cipher
+	cipher     Cipher
 
 	//mark whether the network is connected
 	isAuthenticated bool
@@ -85,7 +84,9 @@ func (c *Client) CheckNetwork() error {
 	if err != nil {
 		return errors.New(err.Error())
 	}
-	defer resp.Body.Close()
+	defer func(Body io.ReadCloser) {
+		_ = Body.Close()
+	}(resp.Body)
 
 	switch resp.StatusCode {
 	case http.StatusNoContent:

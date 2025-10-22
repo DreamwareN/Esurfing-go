@@ -1,4 +1,4 @@
-package client
+package main
 
 import (
 	"context"
@@ -156,7 +156,9 @@ func (c *Client) PostXML(url string, data []byte) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer response.Body.Close()
+	defer func(Body io.ReadCloser) {
+		_ = Body.Close()
+	}(response.Body)
 
 	data, err = io.ReadAll(response.Body)
 	if err != nil {
@@ -184,7 +186,9 @@ func (c *Client) PostXMLWithTimeout(url string, data []byte) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	defer response.Body.Close()
+	defer func(Body io.ReadCloser) {
+		_ = Body.Close()
+	}(response.Body)
 
 	data, err = io.ReadAll(response.Body)
 	if err != nil {
