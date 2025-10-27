@@ -10,7 +10,7 @@ import (
 func (c *Client) MaintainSession() {
 	c.Log.Println("maintaining session")
 	for c.isAuthenticated {
-		c.Log.Println("next heartbeat: ", time.Now().Add(c.HeartbeatInterval).Format(time.DateTime))
+		c.Log.Println("next heartbeat:", time.Now().Add(c.HeartbeatInterval).Format(time.DateTime))
 		select {
 		case <-time.After(c.HeartbeatInterval):
 			if err := c.SendHeartbeat(); err != nil {

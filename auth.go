@@ -51,7 +51,7 @@ func (c *Client) Auth(URL string) error {
 		return err
 	}
 
-	log.Println("ticked:", c.Ticket)
+	log.Println("ticket:", c.Ticket)
 
 	err = c.Login()
 	if err != nil {

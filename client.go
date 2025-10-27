@@ -48,6 +48,13 @@ func (c *Client) Start() {
 	c.Log.Println("client start")
 	defer c.Wg.Done()
 
+	//启动马上检查网络状态
+	c.Log.Println("performing initial network check")
+	if err := c.CheckNetwork(); err != nil {
+		c.Log.Printf("Network check failed:%v", err)
+	}
+	c.Log.Println("initial network check done")
+
 	networkCheckTicker := time.NewTicker(time.Millisecond * time.Duration(c.Config.CheckInterval))
 	defer networkCheckTicker.Stop()
 
@@ -67,7 +74,6 @@ func (c *Client) Start() {
 			return
 		}
 	}
-
 }
 
 func (c *Client) Logout() {
