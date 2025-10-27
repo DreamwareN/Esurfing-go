@@ -48,21 +48,30 @@ func (c *Client) Start() {
 	c.Log.Println("client start")
 	defer c.Wg.Done()
 
+	defer func() {
+		if c.isAuthenticated {
+			c.Logout()
+			c.Log.Println("log out request sent")
+		}
+	}()
+
+	if err := c.CheckNetwork(); err != nil {
+		c.Log.Printf("Network check failed:%v", err)
+	}
+
+	ticker := time.NewTicker(time.Millisecond * time.Duration(c.Config.CheckInterval))
+	defer ticker.Stop()
+
 	for {
 		select {
 		case <-c.Ctx.Done():
-			c.Log.Println("client stop")
-			if c.isAuthenticated {
-				c.Logout()
-				c.Log.Println("log out request sent")
-			}
+			c.Log.Println("client context cancel")
 			return
-		default:
+		case <-ticker.C:
+			if err := c.CheckNetwork(); err != nil {
+				c.Log.Printf("Network check failed:%v", err)
+			}
 		}
-		if err := c.CheckNetwork(); err != nil {
-			c.Log.Printf("Network check failed:%v", err)
-		}
-		time.Sleep(time.Millisecond * time.Duration(c.Config.CheckInterval))
 	}
 }
 

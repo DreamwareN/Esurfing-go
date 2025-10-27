@@ -170,7 +170,7 @@ func (c *Client) PostXML(url string, data []byte) ([]byte, error) {
 
 func (c *Client) PostXMLWithTimeout(url string, data []byte) ([]byte, error) {
 	//set timeout 1s to ensure program not blocking after ctrl+c
-	ctx, cancel := context.WithDeadline(context.Background(), time.Now().Add(time.Second))
+	ctx, cancel := context.WithDeadline(context.Background(), time.Now().Add(time.Second*3))
 	defer cancel()
 	encXML, err := c.cipher.Encrypt(data)
 	if err != nil {
