@@ -48,23 +48,8 @@ func (c *Client) Start() {
 	c.Log.Println("client start")
 	defer c.Wg.Done()
 
-	//启动马上检查网络状态
-	c.Log.Println("performing initial network check")
-	if err := c.CheckNetwork(); err != nil {
-		c.Log.Printf("Network check failed:%v", err)
-	}
-	c.Log.Println("initial network check done")
-
-	networkCheckTicker := time.NewTicker(time.Millisecond * time.Duration(c.Config.CheckInterval))
-	defer networkCheckTicker.Stop()
-
 	for {
 		select {
-		case <-networkCheckTicker.C:
-			//remove go routine due to potential memory and cpu overload
-			if err := c.CheckNetwork(); err != nil {
-				c.Log.Printf("Network check failed:%v", err)
-			}
 		case <-c.Ctx.Done():
 			c.Log.Println("client stop")
 			if c.isAuthenticated {
@@ -72,7 +57,12 @@ func (c *Client) Start() {
 				c.Log.Println("log out request sent")
 			}
 			return
+		default:
 		}
+		if err := c.CheckNetwork(); err != nil {
+			c.Log.Printf("Network check failed:%v", err)
+		}
+		time.Sleep(time.Millisecond * time.Duration(c.Config.CheckInterval))
 	}
 }
 
