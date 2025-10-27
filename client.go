@@ -62,6 +62,7 @@ func (c *Client) Start() {
 			c.Log.Println("client stop")
 			if c.isAuthenticated {
 				c.Logout()
+				c.Log.Println("log out request sent")
 			}
 			return
 		}
@@ -117,6 +118,7 @@ func (c *Client) HandleRedirect(resp *http.Response) error {
 		}
 
 		c.Log.Println("auth finished")
+		c.isAuthenticated = true
 		go c.MaintainSession()
 		return nil
 	}

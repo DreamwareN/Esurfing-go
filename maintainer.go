@@ -8,7 +8,7 @@ import (
 )
 
 func (c *Client) MaintainSession() {
-	c.Log.Println("Maintaining session")
+	c.Log.Println("maintaining session")
 	for c.isAuthenticated {
 		c.Log.Println("next heartbeat: ", time.Now().Add(c.HeartbeatInterval).Format(time.DateTime))
 		select {

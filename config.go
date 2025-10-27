@@ -36,7 +36,7 @@ func LoadConfig(configPath string) error {
 func check(cs []*Config) error {
 	for _, c := range cs {
 		if c.CheckInterval <= 0 {
-			c.CheckInterval = 3000
+			c.CheckInterval = 10000
 		}
 
 		if c.RetryInterval == 0 {

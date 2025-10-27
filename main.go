@@ -27,7 +27,7 @@ func main() {
 	//}
 	//defer pprof.StopCPUProfile()
 
-	var configFilePath = flag.String("c", "json", "config file path")
+	var configFilePath = flag.String("c", "config.json", "config file path")
 	flag.Parse()
 
 	fmt.Println("esurfing client v25.10.15")
@@ -99,11 +99,11 @@ func RunNewClient(c *Config, wg *sync.WaitGroup, ctx context.Context) error {
 }
 
 func getLogPrefix(c *Config) string {
-	return "User:" + c.Username + " BindDevice:" + func() string {
+	return "user:" + c.Username + " bind_device:" + func() string {
 		if c.BindDevice != "" {
 			return c.BindDevice
 		}
-		return "SystemDefault"
+		return "sys_default"
 	}() + " "
 }
 
