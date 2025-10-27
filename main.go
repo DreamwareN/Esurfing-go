@@ -19,18 +19,11 @@ var ClientList []*Client
 
 func main() {
 	var err error
-	//f1, err := os.Create("./prof/p1.prof")
-
-	//err = pprof.StartCPUProfile(f1)
-	//if err != nil {
-	//	log.Fatal(err)
-	//}
-	//defer pprof.StopCPUProfile()
 
 	var configFilePath = flag.String("c", "config.json", "config file path")
 	flag.Parse()
 
-	fmt.Println("esurfing client v25.10.15")
+	fmt.Println("esurfing client v25.10.27")
 
 	ClientList = []*Client{}
 
