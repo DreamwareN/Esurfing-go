@@ -45,24 +45,8 @@ type Client struct {
 }
 
 func NewClient(config *Config) (*Client, error) {
-	if config.CheckInterval <= 0 {
-		config.CheckInterval = 10000
-	}
-
-	if config.RetryInterval == 0 {
-		config.RetryInterval = 10000
-	}
-
-	if config.RetryInterval < 0 {
-		config.RetryInterval = math.MaxInt32
-	}
-
 	if config.Username == "" || config.Password == "" {
 		return nil, errors.New("username or password is empty")
-	}
-
-	if config.BindInterface == "" {
-		config.BindInterface = "sys_default"
 	}
 
 	transport, err := NewHttpTransport(config)
@@ -74,6 +58,19 @@ func NewClient(config *Config) (*Client, error) {
 
 	rid := GenerateRandomString(5)
 
+	if config.BindInterface == "" {
+		config.BindInterface = "sys_default"
+	}
+	if config.CheckInterval <= 0 {
+		config.CheckInterval = 10000
+	}
+	if config.RetryInterval == 0 {
+		config.RetryInterval = 10000
+	}
+	if config.RetryInterval < 0 {
+		config.RetryInterval = math.MaxInt32
+	}
+	
 	cl := &Client{
 		Config: config,
 		Ctx:    ctx,
