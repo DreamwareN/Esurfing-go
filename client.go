@@ -153,7 +153,7 @@ func (c *Client) SendHeartbeat() error {
 func (c *Client) Logout() {
 	request, _ := c.NewGetRequest("http://connect.rom.miui.com/generate_204")
 	resp, _ := c.HttpClient.Do(request)
-	if resp.StatusCode == http.StatusNoContent {
+	if resp.StatusCode == http.StatusNoContent && c.cipher != nil {
 		stateXML, _ := c.GenerateStateXML()
 		_, _ = c.PostXMLWithTimeout(c.TermUrl, stateXML)
 		c.Log.Println("log out request sent")
