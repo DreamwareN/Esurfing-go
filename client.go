@@ -70,7 +70,7 @@ func NewClient(config *Config) (*Client, error) {
 	if config.RetryInterval < 0 {
 		config.RetryInterval = math.MaxInt32
 	}
-	
+
 	cl := &Client{
 		Config: config,
 		Ctx:    ctx,
@@ -96,6 +96,7 @@ func NewClient(config *Config) (*Client, error) {
 func (c *Client) Start() {
 	c.Log.Println("client start")
 	defer wg.Done()
+	defer c.heartBeatTicker.Stop()
 	defer c.Logout()
 
 	if err := c.CheckNetwork(); err != nil {

@@ -124,6 +124,7 @@ func FormatEConfig(data []byte) ([]byte, error) {
 func NewHttpTransport(c *Config) (http.RoundTripper, error) {
 	if c.BindInterface != "" {
 		ip, err := GetInterfaceIP(c.BindInterface)
+		fmt.Println(c.BindInterface)
 		if err != nil {
 			return nil, errors.New(fmt.Errorf("failed to get interface IP: %w", err).Error())
 		}
