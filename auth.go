@@ -53,6 +53,8 @@ func (c *Client) Auth(URL string) error {
 
 	log.Println("ticket:", c.Ticket)
 
+	time.Sleep(time.Millisecond * 333)
+
 	err = c.Login()
 	if err != nil {
 		return err
@@ -226,6 +228,6 @@ func (c *Client) Login() error {
 		return errors.New(err.Error())
 	}
 
-	c.HeartbeatInterval = time.Second * time.Duration(keepRetrySec)
+	c.heartBeatTicker.Reset(time.Second * time.Duration(keepRetrySec))
 	return nil
 }

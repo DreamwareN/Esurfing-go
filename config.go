@@ -3,7 +3,6 @@ package main
 import (
 	"encoding/json"
 	"errors"
-	"math"
 	"os"
 )
 
@@ -12,11 +11,11 @@ type Config struct {
 	Password      string `json:"password"`
 	CheckInterval int    `json:"check_interval"`
 	RetryInterval int    `json:"retry_interval"`
-	BindDevice    string `json:"bind_device"`
+	BindInterface string `json:"bind_interface"`
 	DnsAddress    string `json:"dns_address"`
 }
 
-var List []*Config
+var Configs []*Config
 
 func LoadConfig(configPath string) error {
 	file, err := os.ReadFile(configPath)
@@ -26,31 +25,9 @@ func LoadConfig(configPath string) error {
 		}
 		return err
 	}
-	err = json.Unmarshal(file, &List)
+	err = json.Unmarshal(file, &Configs)
 	if err != nil {
 		return errors.New("load config file error: " + err.Error())
 	}
-	return check(List)
-}
-
-func check(cs []*Config) error {
-	for _, c := range cs {
-		if c.CheckInterval <= 0 {
-			c.CheckInterval = 10000
-		}
-
-		if c.RetryInterval == 0 {
-			c.RetryInterval = 10000
-		}
-
-		if c.RetryInterval < 0 {
-			c.RetryInterval = math.MaxInt32
-		}
-
-		if c.Username == "" || c.Password == "" {
-			return errors.New("username or password is empty")
-		}
-	}
-
 	return nil
 }

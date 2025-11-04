@@ -1,32 +1,23 @@
 package main
 
 import (
-	"context"
-	"errors"
 	"flag"
-	"fmt"
 	"log"
-	"net"
-	"net/http"
 	"os"
 	"os/signal"
 	"sync"
 	"syscall"
-	"time"
 )
 
-var ClientList []*Client
+var clients []*Client
+var wg sync.WaitGroup
 
 func main() {
 	var err error
-
 	var configFilePath = flag.String("c", "config.json", "config file path")
 	flag.Parse()
 
-	fmt.Println("esurfing client v25.10.27")
-
-	ClientList = []*Client{}
-
+	log.Println("esurfing client v25.11.4")
 	log.Println("reading config")
 
 	err = LoadConfig(*configFilePath)
@@ -34,107 +25,31 @@ func main() {
 		log.Fatal(err)
 	}
 
-	log.Printf("load %d from:%s", len(List), *configFilePath)
+	log.Printf("load %d from:%s", len(Configs), *configFilePath)
 
-	ctx, cancel := context.WithCancel(context.Background())
-	wg := sync.WaitGroup{}
-
-	for _, c := range List {
-		wg.Add(1)
-		err := RunNewClient(c, &wg, ctx)
+	for _, c := range Configs {
+		client, err := NewClient(c)
 		if err != nil {
 			log.Fatal(err)
 		}
+
+		clients = append(clients, client)
+
+		go client.Start()
+
+		wg.Add(1)
 	}
 
-	sigs := make(chan os.Signal, 1)
-	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGHUP)
-	<-sigs
+	signalChannel := make(chan os.Signal, 1)
+	signal.Notify(signalChannel, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT, syscall.SIGHUP)
+	<-signalChannel
 
 	log.Println("stoping all clients")
-	cancel()
-	for _, cl := range ClientList {
-		go func() {
-			cl.HttpClient.CloseIdleConnections()
-		}()
+
+	for _, client := range clients {
+		client.Cancel()
 	}
+
 	wg.Wait()
-}
-
-func RunNewClient(c *Config, wg *sync.WaitGroup, ctx context.Context) error {
-	transport, err := NewHttpTransport(c)
-	if err != nil {
-		return errors.New(fmt.Errorf("failed to create transport: %w", err).Error())
-	}
-
-	cl := &Client{
-		Config: c,
-		Ctx:    ctx,
-		Wg:     wg,
-		HttpClient: &http.Client{
-			CheckRedirect: func(req *http.Request, via []*http.Request) error {
-				return http.ErrUseLastResponse
-			},
-			Transport: transport,
-		},
-		AlgoID: "00000000-0000-0000-0000-000000000000",
-		Log: log.New(
-			os.Stdout,
-			getLogPrefix(c),
-			log.LstdFlags|log.Lmsgprefix,
-		),
-	}
-
-	ClientList = append(ClientList, cl)
-
-	go cl.Start()
-	return nil
-}
-
-func getLogPrefix(c *Config) string {
-	return "user:" + c.Username + " bind_device:" + func() string {
-		if c.BindDevice != "" {
-			return c.BindDevice
-		}
-		return "sys_default"
-	}() + " "
-}
-
-func NewHttpTransport(c *Config) (http.RoundTripper, error) {
-	if c.BindDevice != "" {
-		ip, err := GetInterfaceIP(c.BindDevice)
-		if err != nil {
-			return nil, errors.New(fmt.Errorf("failed to get interface IP: %w", err).Error())
-		}
-
-		localAddr := &net.TCPAddr{IP: net.ParseIP(ip)}
-		return &http.Transport{
-			DialContext: (&net.Dialer{
-				LocalAddr: localAddr,
-				Resolver:  GetResolver(c),
-			}).DialContext,
-		}, nil
-	} else {
-		return &http.Transport{
-			DialContext: (&net.Dialer{
-				Resolver: GetResolver(c),
-			}).DialContext,
-		}, nil
-	}
-}
-
-func GetResolver(c *Config) *net.Resolver {
-	if c.DnsAddress == "" {
-		return net.DefaultResolver
-	}
-
-	return &net.Resolver{
-		PreferGo: true,
-		Dial: func(ctx context.Context, network, address string) (net.Conn, error) {
-			d := net.Dialer{
-				Timeout: 5 * time.Second,
-			}
-			return d.DialContext(ctx, "udp", c.DnsAddress)
-		},
-	}
+	log.Println("exit")
 }

@@ -1,11 +1,14 @@
 package main
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"math/rand/v2"
 	"net"
+	"net/http"
 	"strings"
+	"time"
 )
 
 func GetInterfaceIP(interfaceName string) (string, error) {
@@ -116,4 +119,43 @@ func FormatEConfig(data []byte) ([]byte, error) {
 	str4 := strings.ReplaceAll(str3, "&adtype=0", "")
 
 	return []byte(str4), nil
+}
+
+func NewHttpTransport(c *Config) (http.RoundTripper, error) {
+	if c.BindInterface != "" {
+		ip, err := GetInterfaceIP(c.BindInterface)
+		if err != nil {
+			return nil, errors.New(fmt.Errorf("failed to get interface IP: %w", err).Error())
+		}
+
+		localAddr := &net.TCPAddr{IP: net.ParseIP(ip)}
+		return &http.Transport{
+			DialContext: (&net.Dialer{
+				LocalAddr: localAddr,
+				Resolver:  GetResolver(c),
+			}).DialContext,
+		}, nil
+	} else {
+		return &http.Transport{
+			DialContext: (&net.Dialer{
+				Resolver: GetResolver(c),
+			}).DialContext,
+		}, nil
+	}
+}
+
+func GetResolver(c *Config) *net.Resolver {
+	if c.DnsAddress == "" {
+		return net.DefaultResolver
+	}
+
+	return &net.Resolver{
+		PreferGo: true,
+		Dial: func(ctx context.Context, network, address string) (net.Conn, error) {
+			d := net.Dialer{
+				Timeout: 5 * time.Second,
+			}
+			return d.DialContext(ctx, "udp", c.DnsAddress)
+		},
+	}
 }

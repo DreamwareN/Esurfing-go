@@ -22,7 +22,7 @@
     "password": "12345678",
     "check_interval":0,
     "retry_interval":0,
-    "bind_device":"eth1",
+    "bind_interface":"eth1",
     "dns_address": "119.29.29.29:53"
   }
 ]
